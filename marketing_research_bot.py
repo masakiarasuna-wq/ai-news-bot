@@ -15,19 +15,20 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 DISCORD_GREEN = 0x57F287  # リサーチ用：グリーン
 
 RSS_SOURCES = [
-    {"name": "Research Live", "url": "https://www.research-live.com/rss"},
-    {"name": "Quirks Marketing Research", "url": "https://www.quirks.com/rss.aspx"},
-    {"name": "GreenBook", "url": "https://www.greenbook.org/feed"},
-    {"name": "Survey Sampling International", "url": "https://www.ssinternational.com/feed/"},
+    {"name": "Think with Google", "url": "https://www.thinkwithgoogle.com/rss/"},
     {"name": "MarketingProfs", "url": "https://www.marketingprofs.com/rss/articles.rss"},
-    {"name": "Harvard Business Review", "url": "https://hbr.org/section/marketing/feed"},
+    {"name": "Harvard Business Review", "url": "https://feeds.hbr.org/harvardbusiness"},
+    {"name": "Nielsen Insights", "url": "https://www.nielsen.com/feed/"},
+    {"name": "Forrester Blog", "url": "https://www.forrester.com/blogs/feed/"},
+    {"name": "MarTech", "url": "https://martech.org/feed/"},
+    {"name": "eConsultancy", "url": "https://econsultancy.com/blog/rss/"},
 ]
 
 MAX_PER_SOURCE = 10
 
 
 def fetch_articles(source: dict) -> list[dict]:
-    cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+    cutoff = datetime.now(timezone.utc) - timedelta(days=90)
     try:
         feed = feedparser.parse(source["url"])
     except Exception:
