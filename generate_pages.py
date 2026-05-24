@@ -12,7 +12,7 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 # ===== RSS取得 =====
 
-def fetch_articles(sources, days=30, max_per_source=5):
+def fetch_articles(sources, days=30, max_per_source=3):
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     all_articles = []
     for source in sources:
@@ -29,7 +29,7 @@ def fetch_articles(sources, days=30, max_per_source=5):
                         "title": entry.get("title", ""),
                         "url": entry.get("link", ""),
                         "source": source["name"],
-                        "summary": entry.get("summary", "")[:600],
+                        "summary": entry.get("summary", "")[:300],
                     })
                     count += 1
         except Exception:
@@ -275,11 +275,11 @@ def main():
     # Groqで要約
     print("Groqで要約中...")
     ai_news = summarize_news(ai_articles, "AI", [])
-    time.sleep(2)
+    time.sleep(15)
     mkt_news = summarize_news(mkt_articles, "マーケティング", [], exclude_ai=True)
-    time.sleep(2)
+    time.sleep(15)
     res_news = summarize_news(res_articles, "マーケティングリサーチ", [], exclude_ai=True)
-    time.sleep(2)
+    time.sleep(15)
 
     # 基礎知識生成
     print("基礎知識を生成中...")
@@ -287,16 +287,17 @@ def main():
 参照書籍：Artificial Intelligence: A Modern Approach (Russell & Norvig), Deep Learning (Goodfellow et al.),
 The Hundred-Page Machine Learning Book (Burkov), Human Compatible (Stuart Russell)""", """
 テーマ例：機械学習の基礎、ニューラルネットワーク、LLMの仕組み、プロンプトエンジニアリング、AIの倫理""", today_str)
-    time.sleep(2)
+    time.sleep(15)
     mkt_know = generate_knowledge("マーケティング", """
 参照書籍：Marketing Management (Kotler), Positioning (Al Ries & Jack Trout),
 Building a StoryBrand (Donald Miller), Influence (Robert Cialdini), This Is Marketing (Seth Godin)""", """
 テーマ例：STP分析、4P・4C、ブランドエクイティ、カスタマージャーニー、LTV、価格戦略""", today_str)
-    time.sleep(2)
+    time.sleep(15)
     res_know = generate_knowledge("マーケティングリサーチ", """
 参照書籍：Marketing Research (Malhotra), Thinking Fast and Slow (Kahneman),
 The Mom Test (Fitzpatrick), Predictably Irrational (Dan Ariely), How Brands Grow (Byron Sharp)""", """
 テーマ例：定量・定性調査、サンプリング、質問票設計、インサイトの見つけ方、バイアスの種類""", today_str)
+    time.sleep(15)
 
     # OG画像取得
     print("画像を取得中...")
