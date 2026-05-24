@@ -3,24 +3,53 @@ name: AI News Bot
 on:
   schedule:
     - cron: '0 22 * * *'  # 毎日22:00 UTC = 翌7:00 JST
-  workflow_dispatch:  # 手動実行ボタン
+  workflow_dispatch:
 
 jobs:
-  send-news:
+  ai-news:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - name: Install dependencies
         run: pip install -r requirements.txt
-
-      - name: Run news bot
+      - name: Run AI news bot
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python ai_news_report.py
+
+  marketing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run marketing bot
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          MARKETING_CHANNEL_ID: ${{ secrets.MARKETING_CHANNEL_ID }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python marketing_bot.py
+
+  marketing-research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run marketing research bot
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          MARKETING_RESEARCH_CHANNEL_ID: ${{ secrets.MARKETING_RESEARCH_CHANNEL_ID }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python marketing_research_bot.py
