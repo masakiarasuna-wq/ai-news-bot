@@ -2,6 +2,7 @@ import feedparser
 import requests
 import os
 import json
+import time
 from datetime import datetime, timedelta, timezone
 
 from groq import Groq
@@ -168,6 +169,7 @@ def main() -> None:
             embed["image"] = {"url": image_url}
 
         send_embed({"embeds": [embed]})
+        time.sleep(1.5)
 
     print("完了")
 
