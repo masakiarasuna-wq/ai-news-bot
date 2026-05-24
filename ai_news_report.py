@@ -31,7 +31,7 @@ MAX_PER_SOURCE = 5
 
 
 def fetch_articles(source: dict) -> list[dict]:
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=48)
+    cutoff = datetime.now(timezone.utc) - timedelta(days=30)
     try:
         feed = feedparser.parse(source["url"])
     except Exception:
@@ -79,7 +79,7 @@ def summarize_with_groq(articles: list[dict]) -> dict:
 
 {articles_text}
 
-以下の5つのカテゴリを意識しながら、合計10記事を選んでください。
+以下の5つのカテゴリを意識しながら、合計5記事を選んでください。
 カテゴリに偏りが出ないよう、その日の記事の中からバランスよく選んでください。
 該当記事がないカテゴリは無理に埋めなくて構いません。
 

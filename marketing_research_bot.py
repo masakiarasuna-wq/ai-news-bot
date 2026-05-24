@@ -15,13 +15,13 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 DISCORD_GREEN = 0x57F287  # リサーチ用：グリーン
 
 RSS_SOURCES = [
-    {"name": "Think with Google", "url": "https://www.thinkwithgoogle.com/rss/"},
-    {"name": "MarketingProfs", "url": "https://www.marketingprofs.com/rss/articles.rss"},
+    {"name": "Research Live", "url": "https://www.research-live.com/rss"},
+    {"name": "Quirks Marketing Research", "url": "https://www.quirks.com/rss.aspx"},
     {"name": "Harvard Business Review", "url": "https://feeds.hbr.org/harvardbusiness"},
-    {"name": "Nielsen Insights", "url": "https://www.nielsen.com/feed/"},
-    {"name": "Forrester Blog", "url": "https://www.forrester.com/blogs/feed/"},
-    {"name": "MarTech", "url": "https://martech.org/feed/"},
-    {"name": "eConsultancy", "url": "https://econsultancy.com/blog/rss/"},
+    {"name": "Think with Google", "url": "https://www.thinkwithgoogle.com/rss/"},
+    {"name": "MarketingProfs Research", "url": "https://www.marketingprofs.com/rss/articles.rss"},
+    {"name": "WARC", "url": "https://www.warc.com/rss"},
+    {"name": "Ipsos Insights", "url": "https://www.ipsos.com/en/rss.xml"},
 ]
 
 MAX_PER_SOURCE = 10
@@ -79,7 +79,13 @@ def summarize_with_groq(articles: list[dict]) -> dict:
 これらから最も重要・参考になる5記事を選び、以下のJSON形式のみで返してください。
 余計な説明は不要です。日本語のみで記述してください。
 
-選定の観点：調査手法・消費者インサイト・データ分析・リサーチ業界の動向など
+【重要】AIツール・AI技術に関する記事は除いてください。
+以下のテーマを優先して選んでください：
+- 調査手法・アンケート設計
+- 消費者インサイト・行動分析
+- 市場調査・競合調査
+- データ分析・統計手法
+- リサーチ業界の動向・事例
 
 {{
   "intro": "今週のマーケティングリサーチトレンドを3文で説明",
