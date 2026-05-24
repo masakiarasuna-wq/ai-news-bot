@@ -112,7 +112,7 @@ def summarize_with_groq(articles: list[dict]) -> dict:
     text = completion.choices[0].message.content
     start = text.find("{")
     end = text.rfind("}") + 1
-    return json.loads(text[start:end])
+    return json.loads(text[start:end], strict=False)
 
 
 def send_embed(payload: dict) -> None:
