@@ -9,6 +9,13 @@ from groq import Groq
 from bs4 import BeautifulSoup
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
+DISCORD_CHANNEL_IDS = [
+    os.environ.get("DISCORD_CHANNEL_ID"),
+    os.environ.get("MARKETING_CHANNEL_ID"),
+    os.environ.get("MARKETING_RESEARCH_CHANNEL_ID"),
+]
+PAGES_URL = "https://masakiarasuna-wq.github.io/ai-news-bot/"
 
 # ===== RSS取得 =====
 
@@ -328,6 +335,27 @@ The Mom Test (Fitzpatrick), Predictably Irrational (Dan Ariely), How Brands Grow
     Path("site").mkdir(exist_ok=True)
     Path("site/index.html").write_text(html, encoding="utf-8")
     print("完了 → site/index.html")
+
+    # Discord通知
+    if DISCORD_TOKEN:
+        print("Discordに通知中...")
+        headers = {"Authorization": f"Bot {DISCORD_TOKEN}", "Content-Type": "application/json"}
+        payload = {
+            "embeds": [{
+                "title": f"📊 {today_str}のDaily Intelligenceが更新されました",
+                "description": f"AI・マーケティング・リサーチの最新ニュースと基礎知識をまとめたレポートです。",
+                "url": PAGES_URL,
+                "color": 0x1a1a2e,
+                "footer": {"text": "毎朝7時自動更新 | GitHub Pages"},
+            }]
+        }
+        for channel_id in DISCORD_CHANNEL_IDS:
+            if channel_id:
+                url = f"https://discord.com/api/v10/channels/{channel_id}/messages"
+                resp = requests.post(url, headers=headers, json=payload, timeout=15)
+                if not resp.ok:
+                    print(f"[Discord エラー] {channel_id}: {resp.status_code}: {resp.text}")
+                time.sleep(1.5)
 
 
 if __name__ == "__main__":

@@ -132,6 +132,10 @@ jobs:
       - name: Generate HTML
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+          MARKETING_CHANNEL_ID: ${{ secrets.MARKETING_CHANNEL_ID }}
+          MARKETING_RESEARCH_CHANNEL_ID: ${{ secrets.MARKETING_RESEARCH_CHANNEL_ID }}
         run: python generate_pages.py
       - uses: actions/upload-pages-artifact@v3
         with:
