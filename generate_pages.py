@@ -58,16 +58,24 @@ def fetch_og_image_url(url):
 
 # ===== Groqで要約・知識生成 =====
 
-def call_groq(prompt):
+def call_groq(prompt, retries=3):
     client = Groq(api_key=GROQ_API_KEY)
-    completion = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[{"role": "user", "content": prompt}],
-    )
-    text = completion.choices[0].message.content
-    start = text.find("{")
-    end = text.rfind("}") + 1
-    return json.loads(text[start:end], strict=False)
+    for attempt in range(retries):
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = completion.choices[0].message.content
+        start = text.find("{")
+        end = text.rfind("}") + 1
+        try:
+            return json.loads(text[start:end], strict=False)
+        except json.JSONDecodeError:
+            if attempt < retries - 1:
+                print(f"  JSON解析失敗、リトライ中... ({attempt + 1}/{retries})")
+                time.sleep(5)
+            else:
+                raise
 
 
 def summarize_news(articles, topic, categories, exclude_ai=False):
