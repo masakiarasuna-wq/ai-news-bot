@@ -130,6 +130,29 @@ def generate_knowledge(topic, sources_text, topics_text, today_str):
     return call_groq(prompt)
 
 
+def generate_tool_tips(tool_name, topics_text, today_str):
+    prompt = f"""あなたは{tool_name}の活用支援の専門家です。今日（{today_str}）の便利な使い方として、実践的なヒントを5つ紹介してください。
+
+{topics_text}
+
+ルール：実際に使える具体的な活用法であること。初心者から中級者が試せる内容にすること。日本語のみで書くこと。毎回異なるヒントを選ぶこと（今日の日付を参考にバリエーションをもたせる）。
+
+以下のJSON形式のみで返してください：
+
+{{
+  "intro": "今日の{tool_name}活用ヒントの概要を1文で",
+  "items": [
+    {{
+      "concept": "活用法のタイトル",
+      "explanation": "3文で具体的に解説（どう操作するか・どんな効果があるかを含める）",
+      "source": "公式ドキュメントまたは関連情報源",
+      "category": "情報整理 or 学習支援 or 業務効率化 or コンテンツ作成 or 分析"
+    }}
+  ]
+}}"""
+    return call_groq(prompt)
+
+
 # ===== HTML生成 =====
 
 def news_card_html(article, image_url, index, color):
@@ -170,21 +193,28 @@ def build_html(sections, today_str):
         active = "active" if i == 0 else ""
         tabs += f'<button class="tab {active}" onclick="showTab({i})" style="--c:{s["color"]}">{s["icon"]} {s["label"]}</button>'
 
-        news_cards = ""
-        for j, (article, img) in enumerate(zip(s["news"]["articles"], s["news_images"]), 1):
-            news_cards += news_card_html(article, img, j, s["color"])
-
         know_cards = ""
         for j, item in enumerate(s["knowledge"]["items"], 1):
             know_cards += knowledge_card_html(item, j, s["color"])
 
         display = "block" if i == 0 else "none"
-        contents += f"""
-<div class="tab-content" id="tab-{i}" style="display:{display}">
+
+        if s.get("news"):
+            news_cards = ""
+            for j, (article, img) in enumerate(zip(s["news"]["articles"], s["news_images"]), 1):
+                news_cards += news_card_html(article, img, j, s["color"])
+            news_section = f"""
   <div class="section-intro" style="border-left:4px solid {s['color']}">{s['news']['intro']}</div>
   <h3 class="section-heading" style="color:{s['color']}">📰 ニュース</h3>
-  <div class="card-grid">{news_cards}</div>
-  <h3 class="section-heading" style="color:{s['color']}">📚 基礎知識</h3>
+  <div class="card-grid">{news_cards}</div>"""
+        else:
+            news_section = ""
+
+        know_heading = "📚 基礎知識" if s.get("news") else "💡 活用ヒント"
+        contents += f"""
+<div class="tab-content" id="tab-{i}" style="display:{display}">
+  {news_section}
+  <h3 class="section-heading" style="color:{s['color']}">{know_heading}</h3>
   <div class="section-intro" style="border-left:4px solid {s['color']}">{s['knowledge']['intro']}</div>
   <div class="card-grid">{know_cards}</div>
 </div>"""
@@ -314,6 +344,29 @@ The Mom Test (Fitzpatrick), Predictably Irrational (Dan Ariely), How Brands Grow
 テーマ例：定量・定性調査、サンプリング、質問票設計、インサイトの見つけ方、バイアスの種類""", today_str)
     time.sleep(15)
 
+    # ツール活用ヒント生成
+    print("ツール活用ヒントを生成中...")
+    notebooklm_tips = generate_tool_tips("NotebookLM（Google）", """
+テーマ例：
+- PDFや文書をアップロードして質問する方法
+- 複数ソースを横断した情報整理
+- ポッドキャスト生成機能の活用
+- 研究・学習での使い方
+- ビジネス資料の要約・分析
+- 引用元を確認しながら読み解く方法
+- ノートブックの整理術""", today_str)
+    time.sleep(15)
+    aitool_tips = generate_tool_tips("AIツール全般（ChatGPT・Claude・Gemini等）", """
+テーマ例：
+- プロンプトの書き方のコツ
+- 業務効率化への活用（メール・資料作成など）
+- 調査・リサーチへの活用
+- アイデア出しへの活用
+- 長文要約のテクニック
+- ロールプレイ・壁打ちへの活用
+- 出力結果の検証・改善方法""", today_str)
+    time.sleep(15)
+
     # OG画像取得
     print("画像を取得中...")
     def get_images(articles):
@@ -336,6 +389,10 @@ The Mom Test (Fitzpatrick), Predictably Irrational (Dan Ariely), How Brands Grow
          "news": mkt_news, "news_images": mkt_images, "knowledge": mkt_know},
         {"label": "リサーチ", "icon": "🔬", "color": "#1ABC9C",
          "news": res_news, "news_images": res_images, "knowledge": res_know},
+        {"label": "NotebookLM", "icon": "📓", "color": "#4285F4",
+         "news": None, "news_images": [], "knowledge": notebooklm_tips},
+        {"label": "AIツール活用", "icon": "🛠️", "color": "#E74C3C",
+         "news": None, "news_images": [], "knowledge": aitool_tips},
     ]
 
     html = build_html(sections, today_str)
